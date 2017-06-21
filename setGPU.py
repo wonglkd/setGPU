@@ -15,7 +15,7 @@ def weighted_choice(choices):
    assert False, "Shouldn't get here"
 
 
-stats = gpustat.GPUStatCollection.new_query()
+stats = [gpu for gpu in gpustat.GPUStatCollection.new_query() if gpu.entry['uuid'] is not None]
 ids = map(lambda gpu: int(gpu.entry['index']), stats)
 ratios = map(lambda gpu: 1. - float(gpu.entry['memory.used']) / float(gpu.entry['memory.total']), stats)
 bestGPU = weighted_choice(zip(ids, ratios))

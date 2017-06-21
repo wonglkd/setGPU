@@ -1,10 +1,24 @@
 import os
 import gpustat
+import random
+
+
+# https://stackoverflow.com/questions/3679694/a-weighted-version-of-random-choice
+def weighted_choice(choices):
+   total = sum(w for c, w in choices)
+   r = random.uniform(0, total)
+   upto = 0
+   for c, w in choices:
+      if upto + w >= r:
+         return c
+      upto += w
+   assert False, "Shouldn't get here"
+
 
 stats = gpustat.GPUStatCollection.new_query()
 ids = map(lambda gpu: int(gpu.entry['index']), stats)
-ratios = map(lambda gpu: float(gpu.entry['memory.used'])/float(gpu.entry['memory.total']), stats)
-bestGPU = min(zip(ids, ratios), key=lambda x: x[1])[0]
+ratios = map(lambda gpu: 1. - float(gpu.entry['memory.used']) / float(gpu.entry['memory.total']), stats)
+bestGPU = weighted_choice(zip(ids, ratios))
 
 print("setGPU: Setting GPU to: {}".format(bestGPU))
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'

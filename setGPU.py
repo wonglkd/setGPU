@@ -5,6 +5,7 @@ import random
 
 # https://stackoverflow.com/questions/3679694/a-weighted-version-of-random-choice
 def weighted_choice(choices):
+   choices = list(choices)
    total = sum(w for c, w in choices)
    r = random.uniform(0, total)
    upto = 0
